@@ -7,12 +7,13 @@ namespace MonoEngine.Class
         private static readonly Dictionary<string, GameObject> pathToGameObject = new Dictionary<string, GameObject>();
         private static int nextId = 0;
 
-        public readonly int InstanceId;
+        private GameObject parent;
         private readonly List<Component> components = new List<Component>();
+        private readonly List<GameObject> children = new List<GameObject>(32);
         private string name;
         private string path;
-        private readonly List<GameObject> children = new List<GameObject>(32);
-        private GameObject parent;
+
+        public readonly int InstanceId;
 
         public GameObject Parent
         {
