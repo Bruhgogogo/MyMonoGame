@@ -7,10 +7,10 @@ using MonoEngine;
 using MonoEngine.Class;
 using MonoEngine.MonoUtils;
 
+using Engine = MonoEngine.MonoEngine;
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using Engine = MonoEngine.MonoEngine;
 
 namespace MyMonoGame.Class
 {
@@ -89,6 +89,8 @@ namespace MyMonoGame.Class
         private float JumpNormalX = 0.0f;
         private float damageInThisFrame = 0.0f;
         private float deathProgress = 0.0f;
+        private float moveInput = 0.0f;
+        private bool jumpRequested = false;
         private bool wasCollision = false;
 
         public override void Awake()
@@ -115,7 +117,7 @@ namespace MyMonoGame.Class
             transform.Position = new Vector2(45.0f, 0.0f);
             transform.Scale = new Vector2(0.78f, 0.97f);
 
-            colliderBox.ScaleOffset = new Vector2(0.8f, 0.85f);
+            colliderBox.ScaleOffset = new Vector2(0.7f, 0.8f);
 
             audioSource.Clip = bgm;
             audioSource.Loop = true;
@@ -138,54 +140,17 @@ namespace MyMonoGame.Class
             return camera.ScreenToWorld(new Vector2(x, 0.0f)).X > transform.Position.X;
         }
 
-        private void ProcessMove(KeyboardState keyboardState, float deltaTime)
+        private void ProcessMove(KeyboardState keyboardState)
         {
-            float inputDirection = 0.0f;
+            moveInput = 0.0f;
 
             if (keyboardState.IsKeyDown(Keys.A))
-            {
-                inputDirection -= 1.0f;
-            }
+                moveInput -= 1.0f;
             else if (keyboardState.IsKeyDown(Keys.D))
-            {
-                inputDirection += 1.0f;
-            }
-
-            bool isMovingBackward = ((IsFacingRight && inputDirection < 0) || (!IsFacingRight && inputDirection > 0)) && IsGrounded;
-
-            float speed = Speed * (isMovingBackward ? MoveBackwardPenaltyFactor : 1.0f);
-            float accel = IsGrounded ? GroundAccel : AirAccel;
-            float fric = IsGrounded ? GroundFric : AirFric;
-
-            Velocity.X += inputDirection * speed * accel * deltaTime;
-            Velocity.X *= MathF.Exp(-fric * deltaTime);
+                moveInput += 1.0f;
 
             if (keyboardState.IsKeyDown(Keys.Space))
-            {
-                if (!IsGrounded && !IsWallSliding) return;
-
-                Vector2 jumpForce = Vector2.Zero;
-
-                if (IsGrounded)
-                {
-                    jumpForce.Y = JumpForce;
-                    IsGrounded = false;
-                }
-
-                if (IsWallSliding)
-                {
-                    jumpForce.X = JumpNormalX * JumpForce * 0.15f;
-                    jumpForce.Y = JumpForce * 0.8f;
-                }
-
-                ApplyJumpForce(jumpForce);
-            }
-        }
-
-        private void ApplyJumpForce(Vector2 jumpForce)
-        {
-            Velocity.X += jumpForce.X;
-            Velocity.Y = jumpForce.Y;
+                jumpRequested = true;
         }
 
         private void ProcessLook(MouseState mouseState)
@@ -212,13 +177,59 @@ namespace MyMonoGame.Class
             }
         }
 
-        private void ProcessInput(KeyboardState keyboardState, MouseState mouseState, float deltaTime)
+        private void ProcessInput(KeyboardState keyboardState, MouseState mouseState)
         {
             if (!IsAlive()) return;
 
             ProcessLook(mouseState);
             ProcessWeapon(keyboardState, mouseState);
-            ProcessMove(keyboardState, deltaTime);
+            ProcessMove(keyboardState);
+        }
+
+        private void ProcessInputVelocity(float deltaTime)
+        {
+            bool isMovingBackward = ((IsFacingRight && moveInput < 0) || (!IsFacingRight && moveInput > 0)) && IsGrounded;
+
+            float speed = Speed * (isMovingBackward ? MoveBackwardPenaltyFactor : 1.0f);
+            float accel = IsGrounded ? GroundAccel : AirAccel;
+
+            Velocity.X += moveInput * speed * accel * deltaTime;
+        }
+
+        private void ProcessJumpRequest()
+        {
+            if (!jumpRequested) return;
+            jumpRequested = false;
+
+            if (!IsGrounded && !IsWallSliding) return;
+
+            Vector2 jumpForce = Vector2.Zero;
+
+            if (IsGrounded)
+            {
+                jumpForce.Y = JumpForce;
+                IsGrounded = false;
+            }
+
+            if (IsWallSliding)
+            {
+                jumpForce.X = JumpNormalX * JumpForce * 0.15f;
+                jumpForce.Y = JumpForce * 0.8f;
+            }
+
+            ApplyJumpForce(jumpForce);
+        }
+
+        private void ApplyJumpForce(Vector2 jumpForce)
+        {
+            Velocity.X += jumpForce.X;
+            Velocity.Y = jumpForce.Y;
+        }
+
+        private void ApplyFriction(float deltaTime)
+        {
+            float fric = IsGrounded ? GroundFric : AirFric;
+            Velocity.X *= MathF.Exp(-fric * deltaTime);
         }
 
         private void ApplyGravity(float deltaTime)
@@ -320,9 +331,6 @@ namespace MyMonoGame.Class
 
         private void MoveAndSlide(float deltaTime)
         {
-            if (!IsAlive())
-                Velocity = Vector2.Zero;
-
             ApplyVelocity(deltaTime);
 
             List<OverlapResult> collisionResult = PhysicalEngine.OverlapCollider(colliderBox.CollisionActor);
@@ -345,18 +353,16 @@ namespace MyMonoGame.Class
 
         private void ProcessDeath(float deltaTime)
         {
-            if (IsAlive())
-            {
-                deathProgress = 0.0f;
-                return;
-            }
+            if (IsAlive()) return;
 
             deathProgress = MathF.Min(deathProgress + 2.0f * deltaTime, 1.0f);
 
-            float rotation = 90.0f * MathFEx.EaseSineOut(deathProgress) * MathFEx.Deg2Rad;
+            float smoothedProgress = MathFEx.EaseSineOut(deathProgress);
+
+            float rotation = 90.0f * smoothedProgress * MathFEx.Deg2Rad;
             transform.Rotation = IsFacingRight ? rotation : -rotation;
             
-            rendererSprite.TextureColor = Color.Lerp(rendererSprite.TextureColor, Color.Red, deathProgress);
+            rendererSprite.TextureColor = Color.Lerp(Color.White, Color.Red, smoothedProgress * 0.6f);
         }
 
         private void CameraFollow(float deltaTime)
@@ -368,30 +374,32 @@ namespace MyMonoGame.Class
             camera.transform.Position = Vector2Ex.SmoothDamp(camera.transform.Position, transform.Position, ref cameraVelocity, 0.1f, deltaTime);
         }
 
-        private void ProcessVisual(float deltaTime)
-        {
-            ProcessDeath(deltaTime);
-            CameraFollow(deltaTime);
-        }
-
         public override void Update(GameTime gameTime)
         {
             float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 0.1f);
 
             MouseState mouseState = Mouse.GetState();
             KeyboardState keyboardState = Keyboard.GetState();
-            ProcessInput(keyboardState, mouseState, deltaTime);
+            ProcessInput(keyboardState, mouseState);
 
             ProcessDamage();
 
-            ProcessVisual(deltaTime);
+            ProcessDeath(deltaTime);
+            CameraFollow(deltaTime);
         }
 
         public override void FixedUpdate(GameTime gameTime)
         {
             float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 0.1f);
 
+            if (IsAlive())
+            {
+                ProcessInputVelocity(deltaTime);
+                ProcessJumpRequest();
+            }
+
             ApplyGravity(deltaTime);
+            ApplyFriction(deltaTime);
             MoveAndSlide(deltaTime);
         }
     }
