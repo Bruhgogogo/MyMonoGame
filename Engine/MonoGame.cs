@@ -257,10 +257,32 @@ namespace MonoEngine
             groundTransform.Position = new Vector2(25.0f, -2.0f);
             groundTransform.Scale = new Vector2(50.0f, 0.5f);
 
-            RectangleRenderer rectangleRenderer = groundObject.AddComponent<RectangleRenderer>();
-            rectangleRenderer.Origin = new Vector2(0.5f, 0.5f);
+            RectangleRenderer groundRectangleRenderer = groundObject.AddComponent<RectangleRenderer>();
+            groundRectangleRenderer.Origin = new Vector2(0.5f, 0.5f);
 
             groundObject.AddComponent<ColliderBox>();
+
+            GameObject rightWallObject = new GameObject("RightWall");
+
+            Transform rightWallTransform = rightWallObject.AddComponent<Transform>();
+            rightWallTransform.Position = new Vector2(50.25f, 23.25f);
+            rightWallTransform.Scale = new Vector2(0.5f, 50.0f);
+
+            RectangleRenderer rightWallRenderer = rightWallObject.AddComponent<RectangleRenderer>();
+            rightWallRenderer.Origin = new Vector2(0.5f, 0.5f);
+
+            rightWallObject.AddComponent<ColliderBox>();
+
+            GameObject jumpTestWallObject = new GameObject("JumpTestWall");
+
+            Transform jumpTestWallTransform = jumpTestWallObject.AddComponent<Transform>();
+            jumpTestWallTransform.Position = new Vector2(48.25f, 23.75f);
+            jumpTestWallTransform.Scale = new Vector2(0.5f, 49.0f);
+
+            RectangleRenderer jumpTestWallRenderer = jumpTestWallObject.AddComponent<RectangleRenderer>();
+            jumpTestWallRenderer.Origin = new Vector2(0.5f, 0.5f);
+
+            jumpTestWallObject.AddComponent<ColliderBox>();
         }
     }
 }
