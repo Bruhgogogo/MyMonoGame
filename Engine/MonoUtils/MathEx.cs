@@ -79,35 +79,35 @@ namespace MonoEngine.MonoUtils
             return length - MathF.Abs(t - length);
         }
 
-        public static float EaseInQuad(float t)
+        public static float EaseQuadIn(float t)
         {
             return t * t;
         }
 
-        public static float EaseOutQuad(float t)
+        public static float EaseQuadOut(float t)
         {
             return t * (2f - t);
         }
 
-        public static float EaseInOutQuad(float t)
+        public static float EaseQuadInOut(float t)
         {
             if (t < 0.5f)
                 return 2f * t * t;
             return -1f + (4f - 2f * t) * t;
         }
 
-        public static float EaseInCubic(float t)
+        public static float EaseCubicIn(float t)
         {
             return t * t * t;
         }
 
-        public static float EaseOutCubic(float t)
+        public static float EaseCubicOut(float t)
         {
             float f = t - 1f;
             return f * f * f + 1f;
         }
 
-        public static float EaseInOutCubic(float t)
+        public static float EaseCubicInOut(float t)
         {
             if (t < 0.5f)
                 return 4f * t * t * t;
@@ -115,27 +115,27 @@ namespace MonoEngine.MonoUtils
             return 0.5f * f * f * f + 1f;
         }
 
-        public static float EaseInSine(float t)
+        public static float EaseSineIn(float t)
         {
             return 1f - MathF.Cos(t * MathF.PI * 0.5f);
         }
 
-        public static float EaseOutSine(float t)
+        public static float EaseSineOut(float t)
         {
             return MathF.Sin(t * MathF.PI * 0.5f);
         }
 
-        public static float EaseInOutSine(float t)
+        public static float EaseSineInOut(float t)
         {
             return 0.5f * (1f - MathF.Cos(MathF.PI * t));
         }
 
-        public static float BounceEaseIn(float t)
+        public static float EaseBounceIn(float t)
         {
-            return 1f - BounceEaseOut(1f - t);
+            return 1f - EaseBounceOut(1f - t);
         }
 
-        public static float BounceEaseOut(float t)
+        public static float EaseBounceOut(float t)
         {
             if (t < 1f / 2.75f)
                 return 7.5625f * t * t;
@@ -156,28 +156,31 @@ namespace MonoEngine.MonoUtils
             }
         }
 
-        public static float BounceEaseInOut(float t)
+        public static float EaseBounceInOut(float t)
         {
             if (t < 0.5f)
-                return BounceEaseIn(t * 2f) * 0.5f;
-            return BounceEaseOut(t * 2f - 1f) * 0.5f + 0.5f;
+                return EaseBounceIn(t * 2f) * 0.5f;
+            return EaseBounceOut(t * 2f - 1f) * 0.5f + 0.5f;
         }
 
-        public static float ElasticEaseIn(float t)
+        public static float EaseElasticIn(float t)
         {
-            if (t == 0f || t == 1f) return t;
+            if (t == 0f || t == 1f)
+                return t;
             return -MathF.Pow(2f, 10f * (t - 1f)) * MathF.Sin((t - 1.075f) * (2f * MathF.PI) / 0.3f);
         }
 
-        public static float ElasticEaseOut(float t)
+        public static float EaseElasticOut(float t)
         {
-            if (t == 0f || t == 1f) return t;
+            if (t == 0f || t == 1f)
+                return t;
             return MathF.Pow(2f, -10f * t) * MathF.Sin((t - 0.075f) * (2f * MathF.PI) / 0.3f) + 1f;
         }
 
-        public static float ElasticEaseInOut(float t)
+        public static float EaseElasticInOut(float t)
         {
-            if (t == 0f || t == 1f) return t;
+            if (t == 0f || t == 1f)
+                return t;
             if (t < 0.5f)
                 return -0.5f * MathF.Pow(2f, 20f * t - 10f) * MathF.Sin((20f * t - 11.125f) * (2f * MathF.PI) / 0.45f);
             return 0.5f * MathF.Pow(2f, -20f * t + 10f) * MathF.Sin((20f * t - 11.125f) * (2f * MathF.PI) / 0.45f) + 1f;
@@ -282,35 +285,35 @@ namespace MonoEngine.MonoUtils
             return length - Math.Abs(t - length);
         }
 
-        public static double EaseInQuad(double t)
+        public static double EaseQuadIn(double t)
         {
             return t * t;
         }
 
-        public static double EaseOutQuad(double t)
+        public static double EaseQuadOut(double t)
         {
             return t * (2.0 - t);
         }
 
-        public static double EaseInOutQuad(double t)
+        public static double EaseQuadInOut(double t)
         {
             if (t < 0.5)
                 return 2.0 * t * t;
             return -1.0 + (4.0 - 2.0 * t) * t;
         }
 
-        public static double EaseInCubic(double t)
+        public static double EaseCubicIn(double t)
         {
             return t * t * t;
         }
 
-        public static double EaseOutCubic(double t)
+        public static double EaseCubicOut(double t)
         {
             double f = t - 1.0;
             return f * f * f + 1.0;
         }
 
-        public static double EaseInOutCubic(double t)
+        public static double EaseCubicInOut(double t)
         {
             if (t < 0.5)
                 return 4.0 * t * t * t;
@@ -318,27 +321,27 @@ namespace MonoEngine.MonoUtils
             return 0.5 * f * f * f + 1.0;
         }
 
-        public static double EaseInSine(double t)
+        public static double EaseSineIn(double t)
         {
             return 1.0 - Math.Cos(t * Math.PI * 0.5);
         }
 
-        public static double EaseOutSine(double t)
+        public static double EaseSineOut(double t)
         {
             return Math.Sin(t * Math.PI * 0.5);
         }
 
-        public static double EaseInOutSine(double t)
+        public static double EaseSineInOut(double t)
         {
             return 0.5 * (1.0 - Math.Cos(Math.PI * t));
         }
 
-        public static double BounceEaseIn(double t)
+        public static double EaseBounceIn(double t)
         {
-            return 1.0 - BounceEaseOut(1.0 - t);
+            return 1.0 - EaseBounceOut(1.0 - t);
         }
 
-        public static double BounceEaseOut(double t)
+        public static double EaseBounceOut(double t)
         {
             if (t < 1.0 / 2.75)
                 return 7.5625 * t * t;
@@ -359,28 +362,31 @@ namespace MonoEngine.MonoUtils
             }
         }
 
-        public static double BounceEaseInOut(double t)
+        public static double EaseBounceInOut(double t)
         {
             if (t < 0.5)
-                return BounceEaseIn(t * 2.0) * 0.5;
-            return BounceEaseOut(t * 2.0 - 1.0) * 0.5 + 0.5;
+                return EaseBounceIn(t * 2.0) * 0.5;
+            return EaseBounceOut(t * 2.0 - 1.0) * 0.5 + 0.5;
         }
 
-        public static double ElasticEaseIn(double t)
+        public static double EaseElasticIn(double t)
         {
-            if (t == 0.0 || t == 1.0) return t;
+            if (t == 0.0 || t == 1.0)
+                return t;
             return -Math.Pow(2.0, 10.0 * (t - 1.0)) * Math.Sin((t - 1.075) * (2.0 * Math.PI) / 0.3);
         }
 
-        public static double ElasticEaseOut(double t)
+        public static double EaseElasticOut(double t)
         {
-            if (t == 0.0 || t == 1.0) return t;
+            if (t == 0.0 || t == 1.0)
+                return t;
             return Math.Pow(2.0, -10.0 * t) * Math.Sin((t - 0.075) * (2.0 * Math.PI) / 0.3) + 1.0;
         }
 
-        public static double ElasticEaseInOut(double t)
+        public static double EaseElasticInOut(double t)
         {
-            if (t == 0.0 || t == 1.0) return t;
+            if (t == 0.0 || t == 1.0)
+                return t;
             if (t < 0.5)
                 return -0.5 * Math.Pow(2.0, 20.0 * t - 10.0) * Math.Sin((20.0 * t - 11.125) * (2.0 * Math.PI) / 0.45);
             return 0.5 * Math.Pow(2.0, -20.0 * t + 10.0) * Math.Sin((20.0 * t - 11.125) * (2.0 * Math.PI) / 0.45) + 1.0;
